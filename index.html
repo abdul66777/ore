@@ -94,7 +94,7 @@
     <script>
         async function fetchWalletData() {
             try {
-                const response = await fetch('http://localhost:5000/api/balance');
+                const response = await fetch('https://162.253.42.88:5000/api/balance');
                 const data = await response.json();
                 const walletContainer = document.getElementById('wallet-container');
                 const totalBalanceElem = document.getElementById('total-balance');
