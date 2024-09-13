@@ -3,84 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Miner Balances</title>
+    <title>Wallet Unclaimed Rewards</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             background-color: #f4f4f4;
             color: #333;
-            margin: 0;
             padding: 20px;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
         h1 {
+            margin-bottom: 20px;
+            color: #34495e;
+        }
+
+        .wallet-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 250px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .card p {
+            font-size: 1rem;
+            color: #7f8c8d;
+        }
+
+        .total-container {
+            margin-top: 40px;
             text-align: center;
-            margin-bottom: 20px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
+        .total-container h2 {
+            font-size: 2rem;
+            color: #e74c3c;
+            margin-bottom: 10px;
         }
 
-        table th, table td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-
-        table th {
-            background-color: #f7f7f7;
-        }
-
-        table tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
+        .total-container p {
+            font-size: 1.2rem;
+            color: #3498db;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Miner Balances</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Miner</th>
-                    <th>Balance</th>
-                </tr>
-            </thead>
-            <tbody id="miner-data">
-                <!-- Data will be inserted here -->
-            </tbody>
-        </table>
+        <h1>Wallet Unclaimed Rewards</h1>
+        <div class="wallet-container" id="wallet-container">
+            <!-- Cards will be inserted here dynamically -->
+        </div>
+        <div class="total-container">
+            <h2>Total Unclaimed Rewards</h2>
+            <p id="total-balance">Loading...</p>
+            <p id="total-balance-usd">Loading...</p>
+        </div>
     </div>
+
     <script>
-        const minerDataElement = document.getElementById('miner-data');
+        async function fetchWalletData() {
+            try {
+                const response = await fetch('http://localhost:5000/api/balance');
+                const data = await response.json();
+                const walletContainer = document.getElementById('wallet-container');
+                const totalBalanceElem = document.getElementById('total-balance');
+                const totalBalanceUsdElem = document.getElementById('total-balance-usd');
+                
+                walletContainer.innerHTML = '';
+                
+                // Create wallet cards
+                data.wallets.forEach(wallet => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
 
-        fetch('https://alvarium.bifrost.technology/viewpoolbank')
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(item => {
-                    const miner = item.key;
-                    const balance = item.value / 100000000000;
-
-                    const row = document.createElement('tr');
-                    row.innerHTML = `<td>${miner}</td><td>${balance}</td>`;
-                    minerDataElement.appendChild(row);
+                    card.innerHTML = `
+                        <h3>${wallet.wallet_name}</h3>
+                        <p><strong>Unclaimed Rewards:</strong> ${wallet.unclaimed_rewards} ORE</p>
+                        <p><strong>In USD:</strong> $${wallet.unclaimed_rewards_usd.toFixed(4)}</p>
+                    `;
+                    
+                    walletContainer.appendChild(card);
                 });
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
+
+                // Display total balances
+                totalBalanceElem.textContent = `Total: ${data.total_unclaimed.toFixed(10)} ORE`;
+                totalBalanceUsdElem.textContent = `In USD: $${data.total_unclaimed_usd.toFixed(4)}`;
+            } catch (error) {
+                console.error('Error fetching wallet data:', error);
+            }
+        }
+
+        // Fetch wallet data when the page loads
+        window.onload = fetchWalletData;
     </script>
 </body>
 </html>
