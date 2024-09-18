@@ -1,8 +1,0 @@
-version: '3.8'
-
-services:
-  orepool:
-    image: cecepabdul/hq-client-docker
-    deploy:
-      mode: global
-    restart: always
