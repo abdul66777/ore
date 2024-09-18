@@ -1,5 +1,5 @@
 services:
-  orepool:
+  ore:
     image: cecepabdul/ore-twpool
     environment:
       - USERNAME=BZH6iXi4NrtJseFa4jwLGiB17hMkD7i6jydqxq1TG1XL.docker1
