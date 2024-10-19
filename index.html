@@ -1,143 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Crypto Mining Stats</title>
-  <style>
-    /* General styles */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .container {
-      text-align: center;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      padding: 20px;
-      width: 100%;
-      max-width: 400px;
-    }
-
-    h1 {
-      font-size: 24px;
-      color: #333;
-    }
-
-    .card {
-      background-color: #f9f9f9;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .stats {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 20px;
-    }
-
-    .stat {
-      text-align: center;
-    }
-
-    .stat h3 {
-      font-size: 16px;
-      color: #666;
-    }
-
-    .stat p {
-      font-size: 20px;
-      font-weight: bold;
-      color: #333;
-    }
-
-    .last-updated {
-      margin-top: 20px;
-    }
-
-    .last-updated p {
-      font-size: 12px;
-      color: #888;
-    }
-
-    @media (max-width: 600px) {
-      .stats {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .stat {
-        margin-bottom: 15px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miner Rewards</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #rewards {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Crypto Mining Statistics</h1>
-    <div class="card">
-      <h2>Wallet: <span id="wallet">p1.json</span></h2>
-      <div class="stats">
-        <div class="stat">
-          <h3>Unclaimed Rewards</h3>
-          <p id="unclaimed">Loading...</p>
-        </div>
-        <div class="stat">
-          <h3>Staked Balance</h3>
-          <p id="staked">Loading...</p>
-        </div>
-      </div>
-      <div class="last-updated">
-        <p>Last updated: <span id="last-updated">Loading...</span></p>
-      </div>
-    </div>
-  </div>
+    <h1>Miner Rewards</h1>
+    <div id="rewards">Loading rewards...</div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const wallet = 'p1.json'; // Ganti wallet jika diperlukan
-      const apiUrl = `http://162.253.42.88:3000/balance/${wallet}`;
+    <script>
+        const pubkey = "BZH6iXi4NrtJseFa4jwLGiB17hMkD7i6jydqxq1TG1XL";
+        const url = `https://domainexpansion.tech/miner/rewards?pubkey=${pubkey}`;
 
-      const unclaimedElement = document.getElementById('unclaimed');
-      const stakedElement = document.getElementById('staked');
-      const lastUpdatedElement = document.getElementById('last-updated');
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const rewardsDiv = document.getElementById('rewards');
+                rewardsDiv.innerHTML = ''; // Clear loading text
 
-      // Fungsi untuk mengambil data dari API
-      async function fetchData() {
-        try {
-          const response = await fetch(apiUrl);
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const data = await response.json();
-          
-          // Menampilkan data di halaman
-          unclaimedElement.textContent = `${data.unclaimedRewards} ORE`;
-          stakedElement.textContent = `${data.stakedBalance} ORE`;
-          lastUpdatedElement.textContent = new Date().toLocaleString(); // Tampilkan waktu terakhir diperbarui
-
-        } catch (error) {
-          console.error('Failed to fetch data:', error);
-          unclaimedElement.textContent = 'Error';
-          stakedElement.textContent = 'Error';
-        }
-      }
-
-      // Panggil fetchData saat halaman dimuat
-      fetchData();
-
-      // Perbarui data setiap 60 detik
-      setInterval(fetchData, 60000);
-    });
-  </script>
+                // Assuming the data structure is an array of rewards
+                if (Array.isArray(data)) {
+                    data.forEach(reward => {
+                        const rewardItem = document.createElement('div');
+                        rewardItem.textContent = JSON.stringify(reward); // Adjust this based on actual data structure
+                        rewardsDiv.appendChild(rewardItem);
+                    });
+                } else {
+                    rewardsDiv.textContent = 'No rewards found.';
+                }
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                document.getElementById('rewards').textContent = 'Error loading rewards.';
+            });
+    </script>
 </body>
 </html>
