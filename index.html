@@ -29,14 +29,15 @@
                 return response.json();
             })
             .then(data => {
+                console.log(data); // Debugging line to see the actual data structure
                 const rewardsDiv = document.getElementById('rewards');
                 rewardsDiv.innerHTML = ''; // Clear loading text
 
-                // Assuming the data structure is an array of rewards
-                if (Array.isArray(data)) {
-                    data.forEach(reward => {
+                // Check if data contains the expected rewards
+                if (data && Array.isArray(data.rewards) && data.rewards.length > 0) {
+                    data.rewards.forEach(reward => {
                         const rewardItem = document.createElement('div');
-                        rewardItem.textContent = JSON.stringify(reward); // Adjust this based on actual data structure
+                        rewardItem.textContent = JSON.stringify(reward); // Adjust based on actual data structure
                         rewardsDiv.appendChild(rewardItem);
                     });
                 } else {
