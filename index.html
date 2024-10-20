@@ -1,53 +1,108 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Miner Rewards</title>
+    <title>ORE Balance</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
         }
-        #rewards {
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .wallet-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .wallet {
+            font-weight: bold;
+        }
+        .balance {
+            color: #28a745;
+        }
+        h2 {
+            text-align: center;
+            color: #007bff;
+        }
+        .total {
+            font-weight: bold;
             margin-top: 20px;
+            text-align: right;
         }
     </style>
 </head>
 <body>
-    <h1>Miner Rewards</h1>
-    <div id="rewards">Loading rewards...</div>
+
+    <div class="container">
+        <h2>Wallet dan Balance</h2>
+        <div id="walletList"></div>
+        <div id="totalBalance" class="total">Total: 0</div>
+    </div>
 
     <script>
-        const pubkey = "BZH6iXi4NrtJseFa4jwLGiB17hMkD7i6jydqxq1TG1XL";
-        const url = `https://domainexpansion.tech/miner/rewards?pubkey=${pubkey}`;
+        const wallets = [
+            { name: 'Master', pubkey: 'BZH6iXi4NrtJseFa4jwLGiB17hMkD7i6jydqxq1TG1XL' },
+            { name: 'B1', pubkey: 'GsYKqCBLmLSqTxikuhJVsPDtcs1ALvkN6SnHLz5wuShy' },
+			{ name: 'B2', pubkey: 'BvxefjLqZnLNAXwzXfnccPqfGjGqmpPoQz4SqAo1y6gb' },
+			{ name: 'B3', pubkey: 'ASxxQKeigdbajE8ugpEmn2VM1rMKK1xrc5NXBv9ULNEN' },
+			{ name: 'B4', pubkey: 'GToXTw5h6yEKENcZju9aJzr6mQhK6SXmbzoXUtgp3N7B' },
+			{ name: 'B5', pubkey: '8pkbNUXF2qFqk6DLjJNRSwxZyQmFFnp6s6MWrx3jDDKH' },
+			{ name: 'P1', pubkey: 'Ds6QfF6eDoa2t1DAmubVxiHgMrjLL4B1kN2qjsLQzHg' },
+			{ name: 'P2', pubkey: '6zAmc6hCUvwv2pLZH9Q8nDowB6akc3AHTbxmsHmWArt3' },
+			{ name: 'P3', pubkey: '6xqjoMszE7ZSxhZfeqFrEHy6qCnhCzCxAGGHLAHkdJ5f' },
+			{ name: 'P4', pubkey: 'DCYozZgvqMUvekcAKh8Xg7rdEwVoyqEQ6ipdHtpVwpcr' },
+            { name: 'P5', pubkey: '84Lmq8xFaAHy1vteHpeBzxqotx5DNMR3i8jPTRwR7sJA' }
+        ];
 
-        fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log(data); // Debugging line to see the actual data structure
-                const rewardsDiv = document.getElementById('rewards');
-                rewardsDiv.innerHTML = ''; // Clear loading text
+        let totalBalance = 0;
 
-                // Check if data contains the expected rewards
-                if (data && Array.isArray(data.rewards) && data.rewards.length > 0) {
-                    data.rewards.forEach(reward => {
-                        const rewardItem = document.createElement('div');
-                        rewardItem.textContent = JSON.stringify(reward); // Adjust based on actual data structure
-                        rewardsDiv.appendChild(rewardItem);
-                    });
-                } else {
-                    rewardsDiv.textContent = 'No rewards found.';
-                }
-            })
-            .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
-                document.getElementById('rewards').textContent = 'Error loading rewards.';
+        function fetchData(pubkey) {
+            return fetch(`https://domainexpansion.tech/miner/rewards?pubkey=${pubkey}`)
+                .then(response => response.json())
+                .then(data => {
+                    return parseFloat(data) || 0;
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    return 0;
+                });
+        }
+
+        function loadWallets() {
+            const walletList = document.getElementById('walletList');
+            const totalBalanceElement = document.getElementById('totalBalance');
+            walletList.innerHTML = '';
+            totalBalance = 0;
+
+            wallets.forEach(wallet => {
+                fetchData(wallet.pubkey).then(balance => {
+                    totalBalance += balance;
+
+                    const walletItem = document.createElement('div');
+                    walletItem.className = 'wallet-item';
+                    walletItem.innerHTML = `
+                        <div class="wallet">${wallet.name}</div>
+                        <div class="balance">${balance.toFixed(8)}</div>
+                    `;
+                    walletList.appendChild(walletItem);
+
+                    totalBalanceElement.textContent = `Total: ${totalBalance.toFixed(8)}`;
+                });
             });
+        }
+
+        loadWallets();
     </script>
+
 </body>
 </html>
