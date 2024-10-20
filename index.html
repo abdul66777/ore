@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ORE Balance</title>
+    <title>Wallet dan Balance</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -39,32 +39,59 @@
             margin-top: 20px;
             text-align: right;
         }
+        .price {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #ff5722;
+        }
+        .usd-total {
+            font-weight: bold;
+            color: #28a745;
+            text-align: right;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h2>Wallet dan Balance</h2>
+        <div class="price" id="orePrice">$0.00 / ORE</div>
         <div id="walletList"></div>
-        <div id="totalBalance" class="total">Total: 0</div>
+        <div id="totalBalance" class="total">Total: 0 ORE</div>
+        <div id="totalUSD" class="usd-total">Total in USD: $0.00</div>
     </div>
 
     <script>
         const wallets = [
             { name: 'Master', pubkey: 'BZH6iXi4NrtJseFa4jwLGiB17hMkD7i6jydqxq1TG1XL' },
             { name: 'B1', pubkey: 'GsYKqCBLmLSqTxikuhJVsPDtcs1ALvkN6SnHLz5wuShy' },
-			{ name: 'B2', pubkey: 'BvxefjLqZnLNAXwzXfnccPqfGjGqmpPoQz4SqAo1y6gb' },
-			{ name: 'B3', pubkey: 'ASxxQKeigdbajE8ugpEmn2VM1rMKK1xrc5NXBv9ULNEN' },
-			{ name: 'B4', pubkey: 'GToXTw5h6yEKENcZju9aJzr6mQhK6SXmbzoXUtgp3N7B' },
-			{ name: 'B5', pubkey: '8pkbNUXF2qFqk6DLjJNRSwxZyQmFFnp6s6MWrx3jDDKH' },
-			{ name: 'P1', pubkey: 'Ds6QfF6eDoa2t1DAmubVxiHgMrjLL4B1kN2qjsLQzHg' },
-			{ name: 'P2', pubkey: '6zAmc6hCUvwv2pLZH9Q8nDowB6akc3AHTbxmsHmWArt3' },
-			{ name: 'P3', pubkey: '6xqjoMszE7ZSxhZfeqFrEHy6qCnhCzCxAGGHLAHkdJ5f' },
-			{ name: 'P4', pubkey: 'DCYozZgvqMUvekcAKh8Xg7rdEwVoyqEQ6ipdHtpVwpcr' },
+            { name: 'B2', pubkey: 'BvxefjLqZnLNAXwzXfnccPqfGjGqmpPoQz4SqAo1y6gb' },
+            { name: 'B3', pubkey: 'ASxxQKeigdbajE8ugpEmn2VM1rMKK1xrc5NXBv9ULNEN' },
+            { name: 'B4', pubkey: 'GToXTw5h6yEKENcZju9aJzr6mQhK6SXmbzoXUtgp3N7B' },
+            { name: 'B5', pubkey: '8pkbNUXF2qFqk6DLjJNRSwxZyQmFFnp6s6MWrx3jDDKH' },
+            { name: 'P1', pubkey: 'Ds6QfF6eDoa2t1DAmubVxiHgMrjLL4B1kN2qjsLQzHg' },
+            { name: 'P2', pubkey: '6zAmc6hCUvwv2pLZH9Q8nDowB6akc3AHTbxmsHmWArt3' },
+            { name: 'P3', pubkey: '6xqjoMszE7ZSxhZfeqFrEHy6qCnhCzCxAGGHLAHkdJ5f' },
+            { name: 'P4', pubkey: 'DCYozZgvqMUvekcAKh8Xg7rdEwVoyqEQ6ipdHtpVwpcr' },
             { name: 'P5', pubkey: '84Lmq8xFaAHy1vteHpeBzxqotx5DNMR3i8jPTRwR7sJA' }
         ];
 
         let totalBalance = 0;
+        let orePrice = 0;
+
+        function fetchOREPrice() {
+            return fetch('https://price.jup.ag/v4/price?ids=oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp')
+                .then(response => response.json())
+                .then(data => {
+                    orePrice = data.data.oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp.price;
+                    document.getElementById('orePrice').textContent = `$${orePrice.toFixed(2)} / ORE`;
+                })
+                .catch(error => {
+                    console.error('Error fetching ORE price:', error);
+                });
+        }
 
         function fetchData(pubkey) {
             return fetch(`https://domainexpansion.tech/miner/rewards?pubkey=${pubkey}`)
@@ -81,6 +108,7 @@
         function loadWallets() {
             const walletList = document.getElementById('walletList');
             const totalBalanceElement = document.getElementById('totalBalance');
+            const totalUSDElement = document.getElementById('totalUSD');
             walletList.innerHTML = '';
             totalBalance = 0;
 
@@ -96,11 +124,13 @@
                     `;
                     walletList.appendChild(walletItem);
 
-                    totalBalanceElement.textContent = `Total: ${totalBalance.toFixed(8)}`;
+                    totalBalanceElement.textContent = `Total: ${totalBalance.toFixed(8)} ORE`;
+                    totalUSDElement.textContent = `Total in USD: $${(totalBalance * orePrice).toFixed(2)}`;
                 });
             });
         }
 
+        fetchOREPrice();
         loadWallets();
     </script>
 
