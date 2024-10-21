@@ -53,6 +53,12 @@
             text-align: right;
             margin-top: 5px;
         }
+        footer {
+            text-align: center;
+            color: #ffffff;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -63,6 +69,9 @@
         <div id="walletList"></div>
         <div id="totalBalance" class="total">Total: 0 ORE</div>
         <div id="totalUSD" class="usd-total">Total in USD: $0.00</div>
+        <footer>
+            <div id="lastUpdate">Last Update Balance: --</div>
+        </footer>
     </div>
 
     <script>
@@ -107,6 +116,13 @@
                 });
         }
 
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const options = { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const formattedTime = now.toLocaleTimeString('id-ID', options);
+            document.getElementById('lastUpdate').textContent = `Last Update Balance: ${formattedTime} +7UTC`;
+        }
+
         function loadWallets() {
             const walletList = document.getElementById('walletList');
             const totalBalanceElement = document.getElementById('totalBalance');
@@ -130,10 +146,21 @@
                     totalUSDElement.textContent = `Total in USD: $${(totalBalance * orePrice).toFixed(2)}`;
                 });
             });
+
+            updateLastUpdateTime(); // Update last update time
         }
 
-        fetchOREPrice();
-        loadWallets();
+        // Fetch data and update every 1.5 minutes
+        function updatePage() {
+            fetchOREPrice();
+            loadWallets();
+        }
+
+        // Initial load
+        updatePage();
+
+        // Set interval to update every 1.5 minutes (90000 milliseconds)
+        setInterval(updatePage, 90000);
     </script>
 
 </body>
