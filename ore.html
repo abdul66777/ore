@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORE UNCLAIMED</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #030303;
+            padding: 20px;
+            color: #ffffff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #201e1c;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 0px solid #ddd;
+        }
+        th {
+            background-color: #333;
+            color: #3498db;
+        }
+        .stat-item {
+            padding: 10px 0;
+            color: #ff5722;
+        }
+        .total {
+            font-weight: bold;
+            color: #28a745;
+        }
+        .last-check {
+            font-size: 0.9rem;
+            color: #ffffff;
+            text-align: center;
+            margin-top: 20px;
+        }
+        h2 {
+            text-align: center;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+    <h2>ORE UNCLAIMED</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Wallet</th>
+                    <th>Balance (ORE)</th>
+                    <th>Balance (USD)</th>
+                </tr>
+            </thead>
+            <tbody id="walletsTable">
+                <!-- Data Wallet akan dimasukkan di sini -->
+            </tbody>
+        </table>
+
+        <div class="stat-item" id="orePrice">💲 Price ORE: $0.00 / ORE</div>
+        <div class="stat-item total" id="lastHourTotal">✨ Total unclaimed Last hour: 0 ORE</div>
+        <div class="stat-item total" id="lastHourTotalUSD">💵 Total unclaimed Last hour in USD: $0.00</div>
+        <div class="stat-item total" id="totalBalance">📈 Total unclaimed: 0 ORE</div>
+        <div class="stat-item total" id="totalUSD">💰 Total unclaimed in USD: $0.00</div>
+        <footer class="last-check">
+            <div id="lastUpdate">🕒 Last check: --</div>
+        </footer>
+    </div>
+
+    <script>
+            const wallets = [
+            { name: 'Master', pubkey: 'BZH6iXi4NrtJseFa4jwLGiB17hMkD7i6jydqxq1TG1XL' },
+            { name: 'B1', pubkey: 'GsYKqCBLmLSqTxikuhJVsPDtcs1ALvkN6SnHLz5wuShy' },
+            { name: 'B2', pubkey: 'BvxefjLqZnLNAXwzXfnccPqfGjGqmpPoQz4SqAo1y6gb' },
+            { name: 'B3', pubkey: 'ASxxQKeigdbajE8ugpEmn2VM1rMKK1xrc5NXBv9ULNEN' },
+            { name: 'B4', pubkey: 'GToXTw5h6yEKENcZju9aJzr6mQhK6SXmbzoXUtgp3N7B' },
+            { name: 'B5', pubkey: '8pkbNUXF2qFqk6DLjJNRSwxZyQmFFnp6s6MWrx3jDDKH' },
+            { name: 'P1', pubkey: 'Ds6QfF6eDoa2t1DAmubVxiHgMrjLL4B1kN2qjsLQzHg' },
+            { name: 'P2', pubkey: '6zAmc6hCUvwv2pLZH9Q8nDowB6akc3AHTbxmsHmWArt3' },
+            { name: 'P3', pubkey: '6xqjoMszE7ZSxhZfeqFrEHy6qCnhCzCxAGGHLAHkdJ5f' },
+            { name: 'P4', pubkey: 'DCYozZgvqMUvekcAKh8Xg7rdEwVoyqEQ6ipdHtpVwpcr' },
+            { name: 'P5', pubkey: '84Lmq8xFaAHy1vteHpeBzxqotx5DNMR3i8jPTRwR7sJA' },
+            { name: 'P6', pubkey: '64Z1nPBKghk3qkGkBxwwdNAY8YSybmm2aHBxw6bpQmD4' },
+            { name: 'P7', pubkey: '5xhWRXuFuR4GkZ8sqMCGMbYtskBk9vppHCuHSEN4gStu' },
+            { name: 'P8', pubkey: '64iQnrXEbto7k42LZMtRURboPBNWPkpiCoyu7GCcGEkL' },
+            { name: 'P9', pubkey: '9XDLZHR7LQmxNNsMXNt9LaUQYChPan7GmyFMizvg8xaA' },
+            { name: 'P10', pubkey: 'HV6LUebGymXLN98tKMiF3DKdvzk3Qi2pyAGjZLN4H4in' },
+            { name: 'P11', pubkey: '4seozEBR2gLEZYvLRJrQcnX9h7u2y4aMaEy6roVRo7cJ' },
+            { name: 'P12', pubkey: 'BK6ruPLdpTNAYuijxShi5Uhm25XbmgQAaKxy2PQHdtVe' }
+        ];
+
+        let totalBalance = 0;
+        let lastHourTotal = 0;
+        let orePrice = 0;
+        const lastHourData = {};
+
+        function fetchOREPrice() {
+            return fetch('https://price.jup.ag/v4/price?ids=oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp')
+                .then(response => response.json())
+                .then(data => {
+                    orePrice = data.data.oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp.price;
+                    document.getElementById('orePrice').textContent = `💲 Price ORE: $${orePrice.toFixed(2)} / ORE`;
+                })
+                .catch(error => {
+                    console.error('Error fetching ORE price:', error);
+                });
+        }
+
+        function fetchData(pubkey) {
+            return fetch(`https://domainexpansion.tech/miner/rewards?pubkey=${pubkey}`)
+                .then(response => response.json())
+                .then(data => {
+                    return parseFloat(data) || 0;
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    return 0;
+                });
+        }
+
+        function updateLastHourData(pubkey, currentBalance) {
+            const currentTime = Date.now();
+
+            if (!lastHourData[pubkey]) {
+                lastHourData[pubkey] = { balance: currentBalance, time: currentTime };
+                return 0;
+            }
+
+            const timeDifference = (currentTime - lastHourData[pubkey].time) / (1000 * 60 * 60); // dalam jam
+            let lastHourBalance = lastHourData[pubkey].balance;
+
+            if (timeDifference >= 1) {
+                lastHourData[pubkey].balance = currentBalance;
+                lastHourData[pubkey].time = currentTime;
+                return 0;
+            }
+
+            lastHourBalance = currentBalance - lastHourData[pubkey].balance;
+            return lastHourBalance > 0 ? lastHourBalance : 0;
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const options = { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const formattedTime = now.toLocaleString('id-ID', options);
+            document.getElementById('lastUpdate').textContent = `🕒 Last check: ${formattedTime} (UTC+7)`;
+        }
+
+        function loadWallets() {
+            const walletsTable = document.getElementById('walletsTable');
+            const lastHourTotalElement = document.getElementById('lastHourTotal');
+            const lastHourTotalUSDElement = document.getElementById('lastHourTotalUSD');
+            const totalBalanceElement = document.getElementById('totalBalance');
+            const totalUSDElement = document.getElementById('totalUSD');
+
+            totalBalance = 0;
+            lastHourTotal = 0;
+            walletsTable.innerHTML = ''; // Clear existing table rows
+
+            const promises = wallets.map(wallet => {
+                return fetchData(wallet.pubkey).then(balance => {
+                    totalBalance += balance;
+
+                    const lastHourBalance = updateLastHourData(wallet.pubkey, balance);
+                    lastHourTotal += lastHourBalance;
+
+                    // Menambahkan baris ke tabel
+                    const row = `<tr>
+                                    <td>${wallet.name}</td>
+                                    <td>${balance.toFixed(8)}</td>
+                                    <td>${(balance * orePrice).toFixed(2)}</td>
+                                 </tr>`;
+                    walletsTable.innerHTML += row;
+
+                    return balance;
+                });
+            });
+
+            Promise.all(promises).then(() => {
+                totalUSDElement.textContent = `💰 Total unclaimed in USD: $${(totalBalance * orePrice).toFixed(2)}`;
+                lastHourTotalElement.textContent = `✨ Total unclaimed Last hour: ${lastHourTotal.toFixed(8)} ORE`;
+                lastHourTotalUSDElement.textContent = `💵 Total unclaimed Last hour in USD: $${(lastHourTotal * orePrice).toFixed(2)}`;
+                totalBalanceElement.textContent = `📈 Total unclaimed: ${totalBalance.toFixed(8)} ORE`;
+            });
+
+            updateLastUpdateTime();
+        }
+
+        // Inisialisasi
+        fetchOREPrice().then(loadWallets);
+        setInterval(() => {
+            loadWallets();
+            updateLastUpdateTime();
+        }, 60000); // Update setiap 60 detik
+    </script>
+
+</body>
+</html>
