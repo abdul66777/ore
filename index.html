@@ -1,238 +1,125 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ORE UNCLAIMED</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #030303;
-            padding: 20px;
-            color: #ffffff;
-        }
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            background-color: #201e1c;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            padding: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border: 0px solid #ddd;
-        }
-        th {
-            background-color: #333;
-            color: #3498db;
-        }
-        .stat-item {
-            padding: 10px 0;
-            color: #ff5722;
-        }
-        .total {
-            font-weight: bold;
-            color: #28a745;
-        }
-        .last-check {
-            font-size: 0.9rem;
-            color: #ffffff;
-            text-align: center;
-            margin-top: 20px;
-        }
-        h2 {
-            text-align: center;
-            color: #007bff;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Miner</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+    }
+    header {
+      background-color: #4CAF50;
+      color: white;
+      text-align: center;
+      padding: 15px 0;
+    }
+    .container {
+      width: 80%;
+      margin: 30px auto;
+      background-color: white;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .info-box {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      margin: 10px 0;
+      background-color: #e8f5e9;
+      border-left: 5px solid #4CAF50;
+    }
+    .info-box h3 {
+      margin: 0;
+    }
+    .info-box span {
+      font-weight: bold;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #4CAF50;
+      color: white;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-    
-        <div class="stat-item" id="orePrice">💲 Price ORE: $0.00 / ORE</div>
-        <div class="stat-item total" id="unclaimed1Hour">✨ 1 hour: 0 ORE</div>
-        <div class="stat-item total" id="unclaimed12Hour">✨ 12 hour: 0 ORE</div>
-        <div class="stat-item total" id="unclaimed24Hour">✨ 24 hour: 0 ORE</div>
-        <div class="stat-item total" id="totalBalance">📈 Total unclaimed: 0 ORE</div>
-        <div class="stat-item total" id="totalUSD">💰 Total unclaimed in USD: $0.00</div>
-        <div id="lastUpdate">🕒 Last check: --</div>
-        <br>
-        <table>
-            <thead>
-                <tr>
-                    <th>Wallet</th>
-                    <th>Balance (ORE)</th>
-                    <th>Balance (USD)</th>
-                </tr>
-            </thead>
-            <tbody id="walletsTable">
-                <!-- Data Wallet akan dimasukkan di sini -->
-            </tbody>
-        </table>
+<header>
+  <h1>Dashboard Miner</h1>
+</header>
 
+<div class="container">
+  <h2>Informasi Miner</h2>
 
-        <footer class="last-check">
- 
-        </footer>
-    </div>
+  <div class="info-box">
+    <h3>Epoch</h3>
+    <span id="epoch">-</span>
+  </div>
 
-    <script>
-                const wallets = [
-            { name: 'm', pubkey: 'BZH6iXi4NrtJseFa4jwLGiB17hMkD7i6jydqxq1TG1XL' },
-            { name: 'B1', pubkey: 'GsYKqCBLmLSqTxikuhJVsPDtcs1ALvkN6SnHLz5wuShy' },
-            { name: 'B2', pubkey: 'BvxefjLqZnLNAXwzXfnccPqfGjGqmpPoQz4SqAo1y6gb' },
-            { name: 'B3', pubkey: 'ASxxQKeigdbajE8ugpEmn2VM1rMKK1xrc5NXBv9ULNEN' },
-            { name: 'B4', pubkey: 'GToXTw5h6yEKENcZju9aJzr6mQhK6SXmbzoXUtgp3N7B' },
-            { name: 'B5', pubkey: '8pkbNUXF2qFqk6DLjJNRSwxZyQmFFnp6s6MWrx3jDDKH' },
-            { name: '1', pubkey: 'Ds6QfF6eDoa2t1DAmubVxiHgMrjLL4B1kN2qjsLQzHg' },
-            { name: '2', pubkey: '6zAmc6hCUvwv2pLZH9Q8nDowB6akc3AHTbxmsHmWArt3' },
-            { name: '3', pubkey: '6xqjoMszE7ZSxhZfeqFrEHy6qCnhCzCxAGGHLAHkdJ5f' },
-            { name: '4', pubkey: 'DCYozZgvqMUvekcAKh8Xg7rdEwVoyqEQ6ipdHtpVwpcr' },
-            { name: '5', pubkey: '84Lmq8xFaAHy1vteHpeBzxqotx5DNMR3i8jPTRwR7sJA' },
-            { name: '6', pubkey: '64Z1nPBKghk3qkGkBxwwdNAY8YSybmm2aHBxw6bpQmD4' },
-            { name: '7', pubkey: '5xhWRXuFuR4GkZ8sqMCGMbYtskBk9vppHCuHSEN4gStu' },
-            { name: '8', pubkey: '4seozEBR2gLEZYvLRJrQcnX9h7u2y4aMaEy6roVRo7cJ' },
-            { name: '9', pubkey: '9XDLZHR7LQmxNNsMXNt9LaUQYChPan7GmyFMizvg8xaA' },
-            { name: '10', pubkey: 'HV6LUebGymXLN98tKMiF3DKdvzk3Qi2pyAGjZLN4H4in' },
-            { name: '11', pubkey: '64iQnrXEbto7k42LZMtRURboPBNWPkpiCoyu7GCcGEkL' },
-            { name: '12', pubkey: 'BK6ruPLdpTNAYuijxShi5Uhm25XbmgQAaKxy2PQHdtVe' },
-            { name: '13', pubkey: '7QbTGGfLU6xeR4sSHZAAgKuqNrE4XThrDTh6a2vQVNkZ' },
-            { name: '14', pubkey: 'H3a6UqHCACWPmDLbkM2Rv8duA7WR2wa7jFGTLwf6gbNm' },
-            { name: '15', pubkey: '2mMLTNDGRDAMuKhEL6zNZEhZLcRE4o7LE71VXGRA1TX7' },
-            { name: '16', pubkey: '887VYKbN29bubWe3Puyx6kXxGJHNCVtK5eCyZ2MmKvFk' },
-            { name: '17', pubkey: 'AKkuS5MeMcM3ywqveuXiHBsJDjP7VMGEp4gkar6NS2cg' },
-            { name: '18', pubkey: 'B5BqJvLsYWnR9ExTnWD2iCKk3jP9bPmxF5YheEk4REfg' },
-            { name: '19', pubkey: '2gyXGp4WQd72fu9G3Pf5rZh2EfeYGY6Yq5EizRvmwM9S' },
-            { name: '20', pubkey: '4BG3XRwQBnn1Kw44g4NoPocgz6J9TCTsZvkAJz5gXDbF' },
-            { name: '21', pubkey: 'D1m8r2yNRFEefzsxFrvcEzDXWxHSuscLQcrym1R73x69' },
-            { name: '22', pubkey: 'GndjnB6AyKwKm52vtAC6rt92ChzbMTzfZ54fzU4JwZt' },
-            { name: '23', pubkey: 'FJb78RFYZS32UqhAE1qzLczR2gPPBJQy7zkR4GLjbh5y' },
-            { name: '24', pubkey: '836CnGDoyFFxHWBD8L5ACi6hkPy5oJgvgKpEuvCCgRAh' },
-            { name: '25', pubkey: '8BxGheWjCAMTNcvAjnQiS2daybbFmMXZDsNoaA4uTJkv' }
-        ];
+  <div class="info-box">
+    <h3>Iterasi</h3>
+    <span id="iterrate">-</span>
+  </div>
 
-        let totalBalance = 0;
-        let orePrice = 0;
-        const balanceHistory = {};
+  <div class="info-box">
+    <h3>Jumlah Perangkat</h3>
+    <span id="devices">-</span>
+  </div>
 
-        function fetchOREPrice() {
-            return fetch('https://price.jup.ag/v4/price?ids=oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp')
-                .then(response => response.json())
-                .then(data => {
-                    orePrice = data.data.oreoU2P8bN6jkk3jbaiVxYnG1dCXcYxwhwyK9jSybcp.price;
-                    document.getElementById('orePrice').textContent = `💲 Price ORE: $${orePrice.toFixed(2)} / ORE`;
-                })
-                .catch(error => {
-                    console.error('Error fetching ORE price:', error);
-                });
-        }
+  <div class="info-box">
+    <h3>Solo Solutions</h3>
+    <span id="solo-solutions">-</span>
+  </div>
 
-        function fetchData(pubkey) {
-            return fetch(`https://domainexpansion.tech/miner/rewards?pubkey=${pubkey}`)
-                .then(response => response.json())
-                .then(data => {
-                    return parseFloat(data) || 0;
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    return 0;
-                });
-        }
+  <div class="info-box">
+    <h3>PPLNS Shares</h3>
+    <span id="pplns-shares">-</span>
+  </div>
 
-        function updateSlidingWindow(pubkey, currentBalance, timeLimit) {
-            const currentTime = Date.now();
+  <div class="info-box">
+    <h3>Versi Miner Minimum</h3>
+    <span id="min-miner-version">-</span>
+  </div>
+</div>
 
-            // Jika belum ada data untuk wallet ini, inisialisasi
-            if (!balanceHistory[pubkey]) {
-                balanceHistory[pubkey] = [{ balance: currentBalance, time: currentTime }];
-                return 0;
-            }
+<footer>
+  <p>Miner Dashboard &copy; 2024</p>
+</footer>
 
-            // Filter data agar hanya menyimpan data dalam rentang waktu yang diinginkan
-            balanceHistory[pubkey] = balanceHistory[pubkey].filter(entry => {
-                const timeDifference = (currentTime - entry.time) / (1000 * 60 * 60); // hitung perbedaan dalam jam
-                return timeDifference <= timeLimit;
-            });
+<script>
+  // URL API untuk mengambil data
+  const apiUrl = "https://pool.qubic.solutions/info?miner=VHTDSWYLKHBYCAFESSZGSHABLOEDXZDQYYQZJXNXXAKHDDUJXQZFXQHCHONE";
 
-            // Tambahkan entri baru untuk saldo terbaru
-            balanceHistory[pubkey].push({ balance: currentBalance, time: currentTime });
+  // Fungsi untuk mengambil data dan memperbarui UI
+  async function fetchData() {
+    try {
+      // Mengambil data dari API
+      const response = await fetch(apiUrl);
+      const data = await response.json();
 
-            // Hitung perubahan saldo selama timeLimit terakhir
-            const oldestEntry = balanceHistory[pubkey][0];
-            const unclaimedBalance = currentBalance - oldestEntry.balance;
-            return unclaimedBalance > 0 ? unclaimedBalance : 0;
-        }
+      // Mengisi elemen dengan data yang diterima dari API
+      document.getElementById("epoch").innerText = data.epoch || '-';
+      document.getElementById("iterrate").innerText = data.iterrate || '-';
+      document.getElementById("devices").innerText = data.devices || '-';
+      document.getElementById("solo-solutions").innerText = data.solo.solutions || '-';
+      document.getElementById("pplns-shares").innerText = data.pplns.shares || '-';
+      document.getElementById("min-miner-version").innerText = data.min_miner_version || '-';
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      alert("Gagal memuat data dari API.");
+    }
+  }
 
-        function updateLastUpdateTime() {
-            const now = new Date();
-            const options = { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            const formattedTime = now.toLocaleString('id-ID', options);
-            document.getElementById('lastUpdate').textContent = `🕒 Last check: ${formattedTime} (UTC+7)`;
-        }
+  // Memanggil fungsi fetchData saat halaman dimuat
+  fetchData();
+</script>
 
-        function loadWallets() {
-            const walletsTable = document.getElementById('walletsTable');
-            const unclaimed1HourElement = document.getElementById('unclaimed1Hour');
-            const unclaimed12HourElement = document.getElementById('unclaimed12Hour');
-            const unclaimed24HourElement = document.getElementById('unclaimed24Hour');
-            const totalBalanceElement = document.getElementById('totalBalance');
-            const totalUSDElement = document.getElementById('totalUSD');
-
-            let unclaimed1HourTotal = 0;
-            let unclaimed12HourTotal = 0;
-            let unclaimed24HourTotal = 0;
-            totalBalance = 0;
-
-            walletsTable.innerHTML = ''; // Bersihkan baris tabel yang ada
-
-            const promises = wallets.map(wallet => {
-                return fetchData(wallet.pubkey).then(balance => {
-                    totalBalance += balance;
-
-                    const unclaimed1Hour = updateSlidingWindow(wallet.pubkey, balance, 1);
-                    const unclaimed12Hour = updateSlidingWindow(wallet.pubkey, balance, 12);
-                    const unclaimed24Hour = updateSlidingWindow(wallet.pubkey, balance, 24);
-
-                    unclaimed1HourTotal += unclaimed1Hour;
-                    unclaimed12HourTotal += unclaimed12Hour;
-                    unclaimed24HourTotal += unclaimed24Hour;
-
-                    // Menambahkan baris ke tabel
-                    const row = `<tr>
-                                    <td>${wallet.name}</td>
-                                    <td>${balance.toFixed(8)}</td>
-                                    <td>${(balance * orePrice).toFixed(2)}</td>
-                                 </tr>`;
-                    walletsTable.innerHTML += row;
-
-                    return balance;
-                });
-            });
-
-            Promise.all(promises).then(() => {
-                totalUSDElement.textContent = `💰 Total unclaimed in USD: $${(totalBalance * orePrice).toFixed(2)}`;
-                unclaimed1HourElement.textContent = `✨ unclaimed 1 hour: ${unclaimed1HourTotal.toFixed(8)} ORE`;
-                unclaimed12HourElement.textContent = `✨ unclaimed 12 hour: ${unclaimed12HourTotal.toFixed(8)} ORE`;
-                unclaimed24HourElement.textContent = `✨ unclaimed 24 hour: ${unclaimed24HourTotal.toFixed(8)} ORE`;
-                totalBalanceElement.textContent = `📈 Total unclaimed: ${totalBalance.toFixed(8)} ORE`;
-                updateLastUpdateTime();
-            });
-        }
-
-        fetchOREPrice();
-        loadWallets();
-        setInterval(() => {
-            fetchOREPrice();
-            loadWallets();
-        }, 60 * 10000); // Update setiap 1 menit
-    </script>
 </body>
 </html>
